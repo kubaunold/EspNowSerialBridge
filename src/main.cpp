@@ -39,15 +39,15 @@
 #include <WiFi.h>
 #include <esp_wifi.h>
 
-#define BOARD2 // BOARD1 or BOARD2
+#define BOARD1 // BOARD1 or BOARD2
 
 #ifdef BOARD1
-#define RECVR_MAC {0x94, 0xB9, 0x7E, 0xFA, 0xD0, 0x10}  // replace with your board's address
+#define RECVR_MAC {0x3C, 0x71, 0xBF, 0x4B, 0xF2, 0x1C}  // replace with your board's address
 //#define BLINK_ON_SEND
 //#define BLINK_ON_SEND_SUCCESS
 #define BLINK_ON_RECV
 #else
-#define RECVR_MAC {0x3C, 0x71, 0xBF, 0x4B, 0xF2, 0x1C}  // replace with your board's address
+#define RECVR_MAC {0x94, 0xB9, 0x7E, 0xFA, 0xD0, 0x10}  // replace with your board's address
 //#define BLINK_ON_SEND
 #define BLINK_ON_SEND_SUCCESS
 //#define BLINK_ON_RECV
