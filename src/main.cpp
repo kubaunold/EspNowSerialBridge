@@ -38,8 +38,12 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include <esp_wifi.h>
+/** 
+ * BOARD1 is the one with white paper attached
+ * BOARD2 looks better and has small blue dot on an antenna mounted on the board
+*/
 
-#define BOARD1 // BOARD1 or BOARD2
+#define BOARD2 // BOARD1 or BOARD2
 
 #ifdef BOARD1
 #define RECVR_MAC {0x3C, 0x71, 0xBF, 0x4B, 0xF2, 0x1C}  // replace with your board's address
@@ -54,14 +58,19 @@
 #endif
 
 #define WIFI_CHAN  13 // 12-13 only legal in US in lower power mode, do not use 14
-// #define BAUD_RATE  115200
-#define BAUD_RATE  9600
+/** Perhaps I can live baudrate at 9600 for slick printing but
+ * when running simulation I should use higher speed in order to 
+ * meet minimum requirements when it comes to amount of data ArduPilot
+ * sends each second (at least 2kB ~ 20'000 baud rate)
+ */
+#define BAUD_RATE  115200
+// #define BAUD_RATE  9600  #up to 1200Bps
 #define TX_PIN     1 // default UART0 is pin 1 (shared by USB)
 #define RX_PIN     3 // default UART0 is pin 3 (shared by USB)
 #define SER_PARAMS SERIAL_8N1 // SERIAL_8N1: start/stop bits, no parity
 
 #define BUFFER_SIZE 250 // max of 250 bytes
-#define DEBUG // for additional serial messages (may interfere with other messages)
+// #define DEBUG // for additional serial messages (may interfere with other messages)
 
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 2  // some boards don't have an LED or have it connected elsewhere
