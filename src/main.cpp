@@ -16,7 +16,10 @@
  * BOARD2 looks better and has small blue dot on an antenna mounted on the board
 */
 
+
+
 #define BOARD2 // BOARD1 or BOARD2
+#define SHOW_MAC_ADDRESS
 
 #ifdef BOARD1
 #define RECVR_MAC {0x3C, 0x71, 0xBF, 0x4B, 0xF2, 0x1C}  // replace with your board's address
@@ -108,7 +111,7 @@ void setup() {
   Serial.println(send_timeout);
   WiFi.mode(WIFI_STA);
 
-  #ifdef DEBUG
+  #ifdef SHOW_MAC_ADDRESS
   Serial.print("ESP32 MAC Address: ");
   Serial.println(WiFi.macAddress());
   #endif
