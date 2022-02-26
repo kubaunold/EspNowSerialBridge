@@ -27,7 +27,8 @@
 //#define BLINK_ON_SEND_SUCCESS
 #define BLINK_ON_RECV
 #else
-#define RECVR_MAC {0x94, 0xB9, 0x7E, 0xFA, 0xD0, 0x10}  // replace with your board's address
+#define MOTHER_RECVR_MAC {0x94, 0xB9, 0x7E, 0xFA, 0xD0, 0x10}  // replace with your board's address
+const uint8_t mother_address[] = MOTHER_RECVR_MAC;
 //#define BLINK_ON_SEND
 #define BLINK_ON_SEND_SUCCESS
 //#define BLINK_ON_RECV
@@ -52,7 +53,7 @@
 #define LED_BUILTIN 2  // some boards don't have an LED or have it connected elsewhere
 #endif
 
-const uint8_t broadcastAddress[] = RECVR_MAC;
+uint8_t broadcastAddress[6];
 // wait for double the time between bytes at this serial baud rate before sending a packet
 // this *should* allow for complete packet forming when using packetized serial comms
 const uint32_t timeout_micros = (int)(1.0 / BAUD_RATE * 1E6) * 20;
@@ -134,7 +135,7 @@ void setup() {
   esp_now_register_send_cb(OnDataSent);
   #endif
   
-  // esp_now_peer_info_t peerInfo;  // scope workaround for arduino-esp32 v2.0.1
+  memcpy(broadcastAddress, mother_address, sizeof(mother_address));
   memcpy(peerInfo.peer_addr, broadcastAddress, 6);
   peerInfo.channel = WIFI_CHAN;  
   peerInfo.encrypt = false;
