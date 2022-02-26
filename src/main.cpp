@@ -19,14 +19,14 @@
  *      CHILD3, then ground GPIO7
 *********************************************************************************/
 
-#include "Arduino.h"
+// #include "Arduino.h"
 #include <esp_now.h>
 #include <WiFi.h>
 #include <esp_wifi.h>
 
 /** Uncomment only one! */
-// #define MOTHER
-#define CHILD1
+#define MOTHER
+// #define CHILD1
 // #define CHILD2
 // #define CHILD3
 
