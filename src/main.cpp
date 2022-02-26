@@ -11,6 +11,7 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include <esp_wifi.h>
+
 /** 
  * BOARD1 is the one with white paper attached
  * BOARD2 looks better and has small blue dot on an antenna mounted on the board
@@ -26,7 +27,7 @@
 #else
 #define RECVR_MAC {0x94, 0xB9, 0x7E, 0xFA, 0xD0, 0x10}  // replace with your board's address
 //#define BLINK_ON_SEND
-#define BLINK_ON_SEND_SUCCESS
+// #define BLINK_ON_SEND_SUCCESS
 //#define BLINK_ON_RECV
 #endif
 
@@ -64,117 +65,120 @@ esp_now_peer_info_t peerInfo;  // scope workaround for arduino-esp32 v2.0.1
 #if defined(DEBUG) || defined(BLINK_ON_SEND_SUCCESS)
 uint8_t led_status = 0;
 void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
-  #ifdef DEBUG
-  if (status == ESP_NOW_SEND_SUCCESS) {
-    Serial.println("Send success");
-  } else {
-  Serial.println("Send failed");
-  }
-  #endif
+    #ifdef DEBUG
+    if (status == ESP_NOW_SEND_SUCCESS) {
+        Serial.println("Send success");
+    } else {
+    Serial.println("Send failed");
+    }
+    #endif
 
-  #ifdef BLINK_ON_SEND_SUCCESS
-  if (status == ESP_NOW_SEND_SUCCESS) {
-    led_status = ~led_status;
-    // this function happens too fast to register a blink
-    // instead, we latch on/off as data is successfully sent
+    #ifdef BLINK_ON_SEND_SUCCESS
+    if (status == ESP_NOW_SEND_SUCCESS) {
+        led_status = ~led_status;
+        // this function happens too fast to register a blink
+        // instead, we latch on/off as data is successfully sent
+        digitalWrite(LED_BUILTIN, led_status);
+        return;
+    }
+    // turn off the LED if send fails
+    led_status = 0;
     digitalWrite(LED_BUILTIN, led_status);
-    return;
-  }
-  // turn off the LED if send fails
-  led_status = 0;
-  digitalWrite(LED_BUILTIN, led_status);
-  #endif
+    #endif
 }
 #endif
 
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
-  #ifdef BLINK_ON_RECV
-  digitalWrite(LED_BUILTIN, HIGH);
-  #endif
-  memcpy(&buf_recv, incomingData, sizeof(buf_recv));
-  Serial.write(buf_recv, len);
-  #ifdef BLINK_ON_RECV
-  digitalWrite(LED_BUILTIN, LOW);
-  #endif
-  #ifdef DEBUG
-  Serial.print("\n Bytes received: ");
-  Serial.println(len);
-  #endif
+    #ifdef BLINK_ON_RECV
+    digitalWrite(LED_BUILTIN, HIGH);
+    #endif
+
+    memcpy(&buf_recv, incomingData, sizeof(buf_recv));
+    Serial.write(buf_recv, len);
+    
+    #ifdef BLINK_ON_RECV
+    digitalWrite(LED_BUILTIN, LOW);
+    #endif
+    
+    #ifdef DEBUG
+    Serial.print("\n Bytes received: ");
+    Serial.println(len);
+    #endif
 }
  
 void setup() {
-  pinMode(LED_BUILTIN, OUTPUT);
-  Serial.begin(BAUD_RATE, SER_PARAMS, RX_PIN, TX_PIN);
-  Serial.println(send_timeout);
-  WiFi.mode(WIFI_STA);
+    pinMode(LED_BUILTIN, OUTPUT);
+    Serial.begin(BAUD_RATE, SER_PARAMS, RX_PIN, TX_PIN);
+    Serial.println(send_timeout);
+    WiFi.mode(WIFI_STA);
 
-  #ifdef DEBUG
-  Serial.print("ESP32 MAC Address: ");
-  Serial.println(WiFi.macAddress());
-  #endif
-  
-  if (esp_wifi_set_channel(WIFI_CHAN, WIFI_SECOND_CHAN_NONE) != ESP_OK) {
     #ifdef DEBUG
-    Serial.println("Error changing WiFi channel");
+    Serial.print("ESP32 MAC Address: ");
+    Serial.println(WiFi.macAddress());
     #endif
-    return;
-  }
+    
+    if (esp_wifi_set_channel(WIFI_CHAN, WIFI_SECOND_CHAN_NONE) != ESP_OK) {
+        #ifdef DEBUG
+        Serial.println("Error changing WiFi channel");
+        #endif
+        return;
+    }
 
-  if (esp_now_init() != ESP_OK) {
-    #ifdef DEBUG
-    Serial.println("Error initializing ESP-NOW");
+    if (esp_now_init() != ESP_OK) {
+        #ifdef DEBUG
+        Serial.println("Error initializing ESP-NOW");
+        #endif
+        return;
+    }
+
+    #if defined(DEBUG) || defined(BLINK_ON_SEND_SUCCESS)
+    esp_now_register_send_cb(OnDataSent);
     #endif
-    return;
-  }
+    
+    // esp_now_peer_info_t peerInfo;  // scope workaround for arduino-esp32 v2.0.1
+    memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+    peerInfo.channel = WIFI_CHAN;  
+    peerInfo.encrypt = false;
 
-  #if defined(DEBUG) || defined(BLINK_ON_SEND_SUCCESS)
-  esp_now_register_send_cb(OnDataSent);
-  #endif
-  
-  // esp_now_peer_info_t peerInfo;  // scope workaround for arduino-esp32 v2.0.1
-  memcpy(peerInfo.peer_addr, broadcastAddress, 6);
-  peerInfo.channel = WIFI_CHAN;  
-  peerInfo.encrypt = false;
+    if (esp_now_add_peer(&peerInfo) != ESP_OK){
+        #ifdef DEBUG
+        Serial.println("Failed to add peer");
+        #endif
+        return;
+    }
 
-  if (esp_now_add_peer(&peerInfo) != ESP_OK){
-    #ifdef DEBUG
-    Serial.println("Failed to add peer");
-    #endif
-    return;
-  }
-
-  esp_now_register_recv_cb(OnDataRecv);
+    esp_now_register_recv_cb(OnDataRecv);
 }
 
 void loop() {
 
-  // read up to BUFFER_SIZE from serial port
-  if (Serial.available()) {
-    while (Serial.available() && buf_size < BUFFER_SIZE) {
-      buf_send[buf_size] = Serial.read();
-      send_timeout = micros() + timeout_micros;
-      buf_size++;
+    // read up to BUFFER_SIZE from serial port
+    if (Serial.available()) {
+        while (Serial.available() && buf_size < BUFFER_SIZE) {
+            buf_send[buf_size] = Serial.read();
+            send_timeout = micros() + timeout_micros;
+            buf_size++;
+        }
     }
-  }
 
-  // send buffer contents when full or timeout has elapsed
-  if (buf_size == BUFFER_SIZE || (buf_size > 0 && micros() >= send_timeout)) {
-    #ifdef BLINK_ON_SEND
-    digitalWrite(LED_BUILTIN, HIGH);
-    #endif
-    esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &buf_send, buf_size);
-    buf_size = 0;
-    #ifdef DEBUG
-    if (result == ESP_OK) {
-      Serial.println("Sent!");
+    // send buffer contents when full or timeout has elapsed
+    if (buf_size == BUFFER_SIZE || (buf_size > 0 && micros() >= send_timeout)) {
+        #ifdef BLINK_ON_SEND
+        digitalWrite(LED_BUILTIN, HIGH);
+        #endif
+        esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &buf_send, buf_size);
+        buf_size = 0;
+        #ifdef DEBUG
+        if (result == ESP_OK) {
+            Serial.println("Sent!");
+        }
+        else {
+            Serial.println("Send error");
+        }
+        #endif
+        #ifdef BLINK_ON_SEND
+        digitalWrite(LED_BUILTIN, LOW);
+        #endif
     }
-    else {
-      Serial.println("Send error");
-    }
-    #endif
-    #ifdef BLINK_ON_SEND
-    digitalWrite(LED_BUILTIN, LOW);
-    #endif
-  }
 
 }
