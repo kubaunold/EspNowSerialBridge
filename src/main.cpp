@@ -32,9 +32,9 @@
 
 /** if I am the Mother */
 #ifdef MOTHER
-    #define CHILD1_PIN 5
-    #define CHILD2_PIN 6
-    #define CHILD3_PIN 7
+    #define CHILD1_PIN 19
+    #define CHILD2_PIN 18
+    #define CHILD3_PIN 5
     #define CHILD1_RECVR_MAC {0x94, 0xB9, 0x7E, 0xFA, 0xD0, 0x10}
     #define CHILD2_RECVR_MAC {0xff, 0xff, 0xff, 0xff, 0xff, 0x00}
     #define CHILD3_RECVR_MAC {0xff, 0xff, 0xff, 0xff, 0xff, 0x00}
