@@ -62,7 +62,7 @@
 #define SER_PARAMS SERIAL_8N1 // SERIAL_8N1: start/stop bits, no parity
 
 #define BUFFER_SIZE 250 // max of 250 bytes
-//#define DEBUG // for additional serial messages (may interfere with other messages)
+#define DEBUG // for additional serial messages (may interfere with other messages)
 
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 2  // some boards don't have an LED or have it connected elsewhere
