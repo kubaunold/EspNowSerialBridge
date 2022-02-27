@@ -58,7 +58,7 @@
         const uint8_t mother_address[] = MOTHER_RECVR_MAC;
     #elif MOTHER_USED == 2
         #define MOTHER_RECVR_MAC {0x94, 0xB9, 0x7E, 0xFA, 0xD0, 0x10}
-        const uint8_t mother_address[] = MOTHER_RECVR_MAC;
+        const uint8_t mother_address[] = MOTHER_RECVR_MAC;q
     #endif
 #endif
 
