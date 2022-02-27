@@ -24,8 +24,8 @@
 */
 
 /** STEP 1/2 */
-// #define MOTHER 1
-#define CHILD 2
+#define MOTHER 2
+// #define CHILD 3
 
 #ifdef CHILD 
 #define I_AM_CHILD
@@ -45,7 +45,7 @@
         #define CHILD3_PIN 5
         #define CHILD1_RECVR_MAC {0x94, 0xB9, 0x7E, 0xCE, 0x2E, 0xC8}
         #define CHILD2_RECVR_MAC {0x94, 0xB9, 0x7E, 0xCE, 0x3C, 0x34}
-        #define CHILD3_RECVR_MAC {0xff, 0xff, 0xff, 0xff, 0xff, 0x00}
+        #define CHILD3_RECVR_MAC {0x94, 0xB9, 0x7E, 0xCE, 0x3B, 0xA4}
         const uint8_t child1_address[] = CHILD1_RECVR_MAC;
         const uint8_t child2_address[] = CHILD2_RECVR_MAC;
         const uint8_t child3_address[] = CHILD3_RECVR_MAC;
