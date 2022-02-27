@@ -24,8 +24,8 @@
 */
 
 /** STEP 1/2 */
-#define MOTHER 1
-// #define CHILD 1
+// #define MOTHER 1
+#define CHILD 2
 
 #ifdef CHILD 
 #define I_AM_CHILD
@@ -43,8 +43,8 @@
         #define CHILD1_PIN 19
         #define CHILD2_PIN 18
         #define CHILD3_PIN 5
-        #define CHILD1_RECVR_MAC {0x94, 0xB9, 0x7E, 0xFA, 0xD0, 0x10}
-        #define CHILD2_RECVR_MAC {0xff, 0xff, 0xff, 0xff, 0xff, 0x00}
+        #define CHILD1_RECVR_MAC {0x94, 0xB9, 0x7E, 0xCE, 0x2E, 0xC8}
+        #define CHILD2_RECVR_MAC {0x94, 0xB9, 0x7E, 0xCE, 0x3C, 0x34}
         #define CHILD3_RECVR_MAC {0xff, 0xff, 0xff, 0xff, 0xff, 0x00}
         const uint8_t child1_address[] = CHILD1_RECVR_MAC;
         const uint8_t child2_address[] = CHILD2_RECVR_MAC;
@@ -111,12 +111,15 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
  
 void setup()
 {
+    Serial.begin(BAUD_RATE, SER_PARAMS, RX_PIN, TX_PIN);
+    Serial.println(send_timeout);
+    WiFi.mode(WIFI_STA);
+
     #ifdef SHOW_MAC_ADDRESS
     /* Show MAC Adress */
     Serial.print("ESP32 MAC Address: ");
     Serial.println(WiFi.macAddress());
     #endif
-
 
     #if defined(I_AM_MOTHER)
     pinMode(CHILD1_PIN, INPUT_PULLUP);
@@ -141,10 +144,6 @@ void setup()
     #elif defined(I_AM_CHILD)
     memcpy(broadcastAddress, mother_address, sizeof(mother_address));
     #endif
-
-    Serial.begin(BAUD_RATE, SER_PARAMS, RX_PIN, TX_PIN);
-    Serial.println(send_timeout);
-    WiFi.mode(WIFI_STA);
 
     if (esp_wifi_set_channel(WIFI_CHAN, WIFI_SECOND_CHAN_NONE) != ESP_OK)
     {
@@ -177,6 +176,7 @@ void setup()
 
 void loop()
 {
+
     // read up to BUFFER_SIZE from serial port
     if (Serial.available())
     {
