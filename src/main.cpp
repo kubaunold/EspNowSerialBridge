@@ -50,15 +50,16 @@
 //#define BLINK_ON_SEND_SUCCESS
 #define BLINK_ON_RECV
 #else
-#define RECVR_MAC MAC_3  // replace with your board's address
-//#define BLINK_ON_SEND
-#define BLINK_ON_SEND_SUCCESS
-//#define BLINK_ON_RECV
+#define RECVR_MAC MAC_2  // replace with your board's address
 #endif
 
-
 #define SHOW_MAC_ADDRESS
-// #define DEBUG // for additional serial messages (may interfere with other messages)
+#define BLINK_ON_SEND
+#define BLINK_ON_SEND_SUCCESS
+#define BLINK_ON_RECV
+#define DEBUG // for additional serial messages (may interfere with other messages)
+
+
 #define WIFI_CHAN  13 // 12-13 only legal in US in lower power mode, do not use 14
 #define BAUD_RATE  115200
 #define TX_PIN     1 // default UART0 is pin 1 (shared by USB)
@@ -68,7 +69,7 @@
 #define BUFFER_SIZE 250 // max of 250 bytes
 
 #ifndef LED_BUILTIN
-#define LED_BUILTIN 2  // some boards don't have an LED or have it connected elsewhere
+#define LED_BUILTIN 9  // some boards don't have an LED or have it connected elsewhere
 #endif
 
 const uint8_t broadcastAddress[] = RECVR_MAC;
