@@ -42,7 +42,7 @@
 
 /** BOARD1 is on PA
  * BOARD2 is on PADA */
-#define BOARD1 // BOARD1 or BOARD2
+#define BOARD2 // BOARD1 or BOARD2
 
 #ifdef BOARD1
 #define RECVR_MAC MAC_4  // replace with your board's address
