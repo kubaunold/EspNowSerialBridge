@@ -8,57 +8,54 @@
  * specific pin
  * 
  * FOLLOW 2 STEPS BELOW!
+ * Select if you are the Mother or the Child!
+ * If you are mother just uncomment `#define MOTHER` and give value 1 or 2 (does not rly matter here which one)
+ * If you are child, uncomment `#define CHILD` and give value  1, 2 or 3 (depends what's written on the board)
+ *  and select which mother is in use (in second step) (also, look at the mother's board to know the number)
 *********************************************************************************/
 
 #include <esp_now.h>
 #include <WiFi.h>
 #include <esp_wifi.h>
-/** 
- * BOARD1 is the one with white paper attached
- * BOARD2 looks better and has small blue dot on an antenna mounted on the board
-*/
+#include "mac_addresses.h"
 
-/** Select if you are the Mother or the Child!
- * If you are mother just choose 1 or 2
- * If you are child choose 1, 2 or 3 and select which mother is in use (in second step)
-*/
-
-/** STEP 1/2 */
-#define MOTHER 2
-// #define CHILD 3
-
+/********************************** STEP 1/2 **********************************/
+// #define MOTHER 1
+#define CHILD 2
+/******************************************************************************/
 #ifdef CHILD 
 #define I_AM_CHILD
-#define MOTHER_USED 2 /** STEP 2/2 */
+/********************************** STEP 2/2 **********************************/
+#define MOTHER_USED 1
+/******************************************************************************/
 #endif
 
 #ifdef MOTHER 
 #define I_AM_MOTHER
 #endif
 
-#define SHOW_MAC_ADDRESS
+// #define SHOW_MAC_ADDRESS
+// #define DEBUG // for additional serial messages (may interfere with other messages)
+
 
 /** if I am the Mother */
 #ifdef I_AM_MOTHER
         #define CHILD1_PIN 19
         #define CHILD2_PIN 18
         #define CHILD3_PIN 5
-        #define CHILD1_RECVR_MAC {0x94, 0xB9, 0x7E, 0xCE, 0x2E, 0xC8}
-        #define CHILD2_RECVR_MAC {0x94, 0xB9, 0x7E, 0xCE, 0x3C, 0x34}
-        #define CHILD3_RECVR_MAC {0x94, 0xB9, 0x7E, 0xCE, 0x3B, 0xA4}
-        const uint8_t child1_address[] = CHILD1_RECVR_MAC;
-        const uint8_t child2_address[] = CHILD2_RECVR_MAC;
-        const uint8_t child3_address[] = CHILD3_RECVR_MAC;
+        const uint8_t child1_address[] = MAC_CHILD1;
+        const uint8_t child2_address[] = MAC_CHILD2;
+        const uint8_t child3_address[] = MAC_CHILD3;
 #endif
 
 /** if I am one of the Children */
 #ifdef I_AM_CHILD
     #if MOTHER_USED == 1
-        #define MOTHER_RECVR_MAC {0x3c, 0x71, 0xbf, 0x4b, 0xf2, 0x1c}
+        #define MOTHER_RECVR_MAC MAC_MOTHER1
         const uint8_t mother_address[] = MOTHER_RECVR_MAC;
     #elif MOTHER_USED == 2
-        #define MOTHER_RECVR_MAC {0x94, 0xB9, 0x7E, 0xFA, 0xD0, 0x10}
-        const uint8_t mother_address[] = MOTHER_RECVR_MAC;q
+        #define MOTHER_RECVR_MAC MAC_MOTHER2
+        const uint8_t mother_address[] = MOTHER_RECVR_MAC;
     #endif
 #endif
 
@@ -80,7 +77,6 @@
 #define SER_PARAMS SERIAL_8N1 // SERIAL_8N1: start/stop bits, no parity
 
 #define BUFFER_SIZE 250 // max of 250 bytes
-// #define DEBUG // for additional serial messages (may interfere with other messages)
 
 
 
@@ -128,14 +124,23 @@ void setup()
     if (digitalRead(CHILD1_PIN) == LOW)
     {   // child one has been chosen
         memcpy(broadcastAddress, child1_address, sizeof(child1_address));
+        #ifdef DEBUG
+        Serial.println("Added peer: CHILD1");
+        #endif
     }
     else if (digitalRead(CHILD2_PIN) == LOW)
     {   // child two has been chosen
         memcpy(broadcastAddress, child2_address, sizeof(child2_address));
+        #ifdef DEBUG
+        Serial.println("Added peer: CHILD2");
+        #endif
     }
     else if (digitalRead(CHILD3_PIN) == LOW)
     {   // child two has been chosen
         memcpy(broadcastAddress, child3_address, sizeof(child3_address));
+        #ifdef DEBUG
+        Serial.println("Added peer: CHILD3");
+        #endif
     }
     else
     {
