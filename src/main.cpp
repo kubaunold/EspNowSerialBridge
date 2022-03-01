@@ -38,23 +38,27 @@
 #include <esp_now.h>
 #include <WiFi.h>
 #include <esp_wifi.h>
+#include "mac_addresses.h"
 
 /** BOARD1 is on PA
  * BOARD2 is on PADA */
 #define BOARD1 // BOARD1 or BOARD2
 
 #ifdef BOARD1
-#define RECVR_MAC {0x94, 0xB9, 0x7E, 0xCE, 0x2E, 0xC8}  // replace with your board's address
+#define RECVR_MAC MAC_4  // replace with your board's address
 //#define BLINK_ON_SEND
 //#define BLINK_ON_SEND_SUCCESS
 #define BLINK_ON_RECV
 #else
-#define RECVR_MAC {0x94, 0xB9, 0x7E, 0xFA, 0xD0, 0x10}  // replace with your board's address
+#define RECVR_MAC MAC_3  // replace with your board's address
 //#define BLINK_ON_SEND
 #define BLINK_ON_SEND_SUCCESS
 //#define BLINK_ON_RECV
 #endif
 
+
+#define SHOW_MAC_ADDRESS
+// #define DEBUG // for additional serial messages (may interfere with other messages)
 #define WIFI_CHAN  13 // 12-13 only legal in US in lower power mode, do not use 14
 #define BAUD_RATE  115200
 #define TX_PIN     1 // default UART0 is pin 1 (shared by USB)
@@ -62,7 +66,6 @@
 #define SER_PARAMS SERIAL_8N1 // SERIAL_8N1: start/stop bits, no parity
 
 #define BUFFER_SIZE 250 // max of 250 bytes
-#define DEBUG // for additional serial messages (may interfere with other messages)
 
 #ifndef LED_BUILTIN
 #define LED_BUILTIN 2  // some boards don't have an LED or have it connected elsewhere
@@ -127,7 +130,7 @@ void setup() {
   Serial.println(send_timeout);
   WiFi.mode(WIFI_STA);
 
-  #ifdef DEBUG
+  #ifdef SHOW_MAC_ADDRESS
   Serial.print("ESP32 MAC Address: ");
   Serial.println(WiFi.macAddress());
   #endif
