@@ -12,6 +12,8 @@
  * If you are mother just uncomment `#define MOTHER` and give value 1 or 2 (does not rly matter here which one)
  * If you are child, uncomment `#define CHILD` and give value  1, 2 or 3 (depends what's written on the board)
  *  and select which mother is in use (in second step) (also, look at the mother's board to know the number)
+ * 
+ * During setup (initial config after boot) led should be on, then it turns off.
 *********************************************************************************/
 
 #include <esp_now.h>
@@ -20,10 +22,11 @@
 #include "mac_addresses.h"
 
 /********************************** STEP 1/2 **********************************/
-// #define MOTHER 1
-#define CHILD 2
+#define MOTHER 1
+// #define CHILD 2
 /******************************************************************************/
-#ifdef CHILD 
+#ifdef CHILD
+#define LED_PIN     4
 #define I_AM_CHILD
 /********************************** STEP 2/2 **********************************/
 #define MOTHER_USED 1
@@ -32,7 +35,11 @@
 
 #ifdef MOTHER 
 #define I_AM_MOTHER
+#define LED_PIN     1
 #endif
+
+#define TURN_ON     HIGH
+#define TURN_OFF    LOW
 
 // #define SHOW_MAC_ADDRESS
 // #define DEBUG // for additional serial messages (may interfere with other messages)
@@ -107,7 +114,14 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len)
  
 void setup()
 {
+    pinMode(LED_PIN, OUTPUT);
     Serial.begin(BAUD_RATE, SER_PARAMS, RX_PIN, TX_PIN);
+
+    digitalWrite(LED_PIN, TURN_ON); // turn on diode during setup
+    #ifdef DEBUG
+    Serial.println("Starting setup");
+    #endif
+
     Serial.println(send_timeout);
     WiFi.mode(WIFI_STA);
 
@@ -177,6 +191,11 @@ void setup()
     }
 
     esp_now_register_recv_cb(OnDataRecv);
+    
+    #ifdef DEBUG
+    Serial.println("Finishing setup");
+    #endif
+    digitalWrite(LED_PIN, TURN_OFF); // turn off diode when setup is finished
 }
 
 void loop()
